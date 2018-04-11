@@ -2,22 +2,19 @@ function [kWorking, error,t,X,idx,K] = gradDescent()
     numMasses = 3;
     kWorking = [];
     for targetNum = 0:1:(2^numMasses-1)
-        
+        targetNum
         biV = de2bi(targetNum, numMasses);
         biV(biV==0)=-1;
-        target = [biV(1),biV(2),biV(3),0,0,0]
-        
+        target = [biV(1),biV(2),biV(3),0,0,0];
         terms = 20;
         randomExplore = 1000;
+        [K, cost] = makeNewK(terms);
 
         clf(figure(1))
         hold on
         
-        while 1
-            restart = 0;
-            [K, cost] = makeNewK(terms);
-
-            
+        restart = 0;
+        while restart == 1
             
             minimalK = K;
             minimalCost = cost;
@@ -52,15 +49,10 @@ function [kWorking, error,t,X,idx,K] = gradDescent()
                 break
             end
         end
-        
-        
         [error,t,X,idx] = howClose(K(1:terms/2),K(terms/2+1:end),target,true);
 
 
     end
-    
-    csvwrite('output.csv', kWorking)
-    
     function cost = objFun(M)
         cutoff = length(M)/2;
         cost = howClose(M(1:cutoff),M(cutoff+1:end),target,false);
