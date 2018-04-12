@@ -1,0 +1,5 @@
+Run findKs.m
+This will add a variable Ks to the workspace (after 5 minutes or so depending on tolerance)
+I've saved an example Ks and you can load it into your workspace for visualization purposes
+
+Go team!
