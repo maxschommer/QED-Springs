@@ -1,4 +1,4 @@
-function [minError,t,X,idx] = howClose(A, F, target, wantPlot)
+function [minError,t,X,F,idx] = howClose(A, F, target, wantPlot)
     % howClose([1,1,1],[.2,1,1.3],[-1,0,1,0,-2,-1],true)
     
     n = length(target)/2; % n masses
@@ -14,7 +14,7 @@ function [minError,t,X,idx] = howClose(A, F, target, wantPlot)
     
     Error = sum((X-target).^2,2) + 3*exp(-t);
     [minError,idx] = min(Error);
-
+    F = driving;
     if wantPlot; makeplot(); end
     
     function M = makeM(n)
@@ -30,6 +30,8 @@ function [minError,t,X,idx] = howClose(A, F, target, wantPlot)
     end
 
     function makeplot()
+        
+        
         time = t(idx);
         exes = ['kx';'bx';'rx';'gx';'cx';'mx'];
         clf(figure(1))
@@ -38,8 +40,15 @@ function [minError,t,X,idx] = howClose(A, F, target, wantPlot)
             plot(t,X(:,i),exes(i))
             plot(time, target(i),exes(i,:))
         end
+
         plot(t,Error./max(Error),'k:','linewidth',3)
         title(['Error: ' num2str(minError)])
+        figure
+
+
+        
+        
+        plot(tRange, drivingPlt);
     end
 end
 

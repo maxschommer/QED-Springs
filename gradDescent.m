@@ -1,4 +1,4 @@
-function [error,t,X,idx,K] = gradDescent()
+function [error,t,X,F,idx,K] = gradDescent()
     target = [1,-1,1,0,0,0];
     terms = 20;
     [K, cost] = makeNewK(terms);
@@ -17,7 +17,7 @@ function [error,t,X,idx,K] = gradDescent()
         i = i+1;
     end 
     
-    [error,t,X,idx] = howClose(K(1:terms/2),K(terms/2+1:end),target,true);
+    [error,t,X,F, idx] = howClose(K(1:terms/2),K(terms/2+1:end),target,true);
     
     function cost = objFun(M)
         cutoff = length(M)/2;
