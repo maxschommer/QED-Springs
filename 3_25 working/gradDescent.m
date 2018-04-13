@@ -51,12 +51,8 @@ function [kWorking, error,t,X,idx,K] = gradDescent()
                 kWorking(:, targetNum+1) = K'
                 break
             end
-        end
-        
-        
+        end  
         [error,t,X,idx] = howClose(K(1:terms/2),K(terms/2+1:end),target,true);
-
-
     end
     
     csvwrite('output.csv', kWorking)
