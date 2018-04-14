@@ -1,22 +1,63 @@
-function K = gradDescent(target,tolerance)
-    terms = 10;
-    [K, cost] = makeNewK(terms);
-    i = 1;
+function K = gradDescent(target,varargin)
+    p = inputParser;
+    addRequired(p,'target');
+    addParameter(p, 'tolerance', .05);
+    addParameter(p, 'time', 15);
+    addParameter(p, 'maxIters', 400);
+    addParameter(p, 'terms', 20);
+    addParameter(p, 'numExplorations', 100);
+    parse(p, target, varargin{:});
     
-    while cost > tolerance
-        stepMatrix = eye(terms)/1000;
-        grad = arrayfun(@(p) cost - objFun(K + stepMatrix(p,:)), 1:terms);
-        K = K + 30 * grad ;
-        cost = objFun(K);
-        i = i+1;
-        
-        if (cost > exp(-i/20)/10+tolerance)
-            [K,cost] = makeNewK(terms); i = 1; 
+    maxIters = p.Results.maxIters;
+    time = p.Results.time;
+    tolerance = p.Results.tolerance;
+    terms = p.Results.terms;
+    numExplorations = p.Results.numExplorations; %Number of random explorations
+    
+    kCostMat = randExplore(numExplorations);
+    
+    exitflag = 0;
+    k = 1;
+    kLim = 5;
+    while exitflag == 0
+        if k > kLim
+            maxIters = maxIters + 500;
+            kLim = kLim + 5;
+            numExplorations = numExplorations*10;
+            kCostMat = randExplore(numExplorations);
+            k = 1;
         end
-    end 
+        options = optimset('PlotFcns',@optimplotfval, 'OutputFcn', @outfun, 'MaxIter', maxIters);
+        K = kCostMat(k, 2:end);
+        k = k+1
+        [K,~,exitflag] = fminsearch(@objFun,K,options);
+    end
     
+    function kCostMat = randExplore(numExplorations)
+        w = waitbar(0, ...
+                ['Exploring Random Solutions: ' int2str(0)]);
+        kCostMat = zeros(numExplorations, 1+terms);
+        for j =1:numExplorations
+            
+            waitbar(j/numExplorations, w, ['Exploring Random Solutions: ' int2str(j)]);
+            
+            [newK, cost] = makeNewK(terms);        
+            kCostMat(j, :) = [cost, newK];
+        end
+        delete(w)
+        kCostMat = sortrows(kCostMat);
+    end
+    
+    function stop = outfun(~, optimValues, ~)
+        if optimValues.fval < tolerance
+            stop = 1;
+        else
+            stop = 0;
+        end
+    end
+
     function cost = objFun(M)
-        [~,~,~,cost] = runOde(M,target);
+        [~,~,~,cost] = runOde(M,target,'time' , time);
     end
 
     function [K, cost] = makeNewK(terms)

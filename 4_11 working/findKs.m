@@ -1,40 +1,41 @@
 clear all
+numMasses = 5;
+numSolutions = 1; % For each state, the number of solutions to explore for 
+                  % minimizing the derivative of the solution.
 
-numSolutions = 10;
-states = [0,0,0,-1,-1,-1;
-          0,0,0,-1,-1,1;
-          0,0,0,-1,1,-1;
-          0,0,0,-1,1,1;
-          0,0,0,1,-1,-1;
-          0,0,0,1,-1,1;
-          0,0,0,1,1,-1;
-          0,0,0,1,1,1];
+for targetNum = 0:1:(2^(numMasses-1)-1)     
+    biV = de2bi(targetNum, numMasses);
+    biV(biV==0)=-1;
+    statesM(targetNum+1, :) = cat(2, zeros(1, numMasses), biV);
+end
+statesM(1,:)
 
-size(states)
-for i = 1:size(states)-1
+f = waitbar( 0, ['Loading ' int2str(0) ' ...']);
+for i = 1:size(statesM)
     maxDiffKs = Inf(1);
+    
     for j = 1:numSolutions
-        clc
-        disp(['Loading ' num2str(i) '...'])
-        disp(strcat('<', repmat('*', [1, round(40*j/numSolutions)]),  repmat('_', [1, round(40*(numSolutions-j)/numSolutions)]), '>'))
-        
-        K_pot = gradDescent(states(i,:), 2);
-        [T,X,drive,~,idx] = runOde(K_pot,states(i,:));
-        Ks(j, i, :) = K_pot;
-%         Y = max(diff(drive)/(T(2)-T(1)));
-%         if Y < maxDiffKs
-%             Ks(i,:) = K_pot;
-%             maxDiffKs = Y;
-%         end
+        waitbar( j/(2*numSolutions), f, ['Loading ' int2str(i) ' ...'])
+        K_pot = gradDescent(statesM(i,:),'tolerance', .005, 'time', 25, ...
+            'maxIters', 100, 'numExplorations', 100);
+        [T,X,drive,~,idx] = runOde(K_pot,statesM(i,:));
+        Ks(i, :) = K_pot;
+        Y = max(diff(drive)/(T(2)-T(1)));
+        if Y < maxDiffKs
+            Ks(i,:) = K_pot;
+            maxDiffKs = Y;
+        end
     end
 end
 
-
+Ks = cat(1, Ks, flipud(-1*Ks));
+States = cat(1, statesM, flipud(-1*statesM));
+save('StateInfo','Ks', 'States')
 
 clf(figure(1))
 hold on
-for i = 1:size(states)-1
-    [T,X,drive,~,idx] = runOde(Ks(1, i,:),states(i,:));
+for i = 1:size(statesM)
+    [T,X,drive,~,idx] = runOde(Ks(i,:),statesM(i,:));
     plot(T-T(idx),X(:,4:6)) 
     
 end
