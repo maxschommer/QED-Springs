@@ -1,4 +1,5 @@
 function moveOneServo(K, States)
+
     
     if exist('a') ~= 1
         a = arduino;
@@ -7,11 +8,12 @@ function moveOneServo(K, States)
     end
 
     if exist('K') ~= 1 
-        K = gradDescent([0,0,0,1,0,0],.005);
-        A = K(1:length(K)/2);
-        F = K(length(K)/2+1:end);
-    end
+        K = gradDescent([0,0,0,1,0,0],'tolerance', .005);
 
+    end
+    A = K(1:length(K)/2);
+    F = K(length(K)/2+1:end);
+    
     tRange = linspace(0,10,500);
     driving = @(t) dot(sin(t*F),A)/10 +.5;
 

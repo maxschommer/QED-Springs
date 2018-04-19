@@ -1,5 +1,5 @@
 clear all
-numMasses = 5;
+numMasses = 3;
 numSolutions = 1; % For each state, the number of solutions to explore for 
                   % minimizing the derivative of the solution.
 
@@ -30,7 +30,7 @@ end
 
 Ks = cat(1, Ks, flipud(-1*Ks));
 States = cat(1, statesM, flipud(-1*statesM));
-save('StateInfo','Ks', 'States')
+save('StateInfo3M','Ks', 'States')
 
 clf(figure(1))
 hold on

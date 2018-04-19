@@ -1,7 +1,7 @@
  function springUI 
-    width = 6;
-    height = 5;
-    stateInfo = load('StateInfo');
+    width = 1;
+    height = 3;
+    stateInfo = load('StateInfo3M');
     stateMatrix = -1*ones(height, width);
     KExec = zeros(width, size(stateInfo.Ks, 2));
     f = figure('Visible','off');
@@ -25,11 +25,14 @@
     
     function execButton_Callback(~, ~, ~)
          for k = 1:width
+             
              S = stateInfo.States(:, height+1:end);
              V = stateMatrix(: , k)';
              index = find(ismember(S,V,'rows'), 1, 'first'); 
              KExec(k, :) = stateInfo.Ks(index, :);
          end
+         
+         moveOneServo(KExec(1, :))
     end
     
     function togglebutton_Callback(hObject, eventdata, ~)
