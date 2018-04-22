@@ -16,8 +16,8 @@ for i = 1:size(statesM)
     
     for j = 1:numSolutions
         waitbar( j/(2*numSolutions), f, ['Loading ' int2str(i) ' ...'])
-        K_pot = gradDescent(statesM(i,:),'tolerance', .005, 'time', 25, ...
-            'maxIters', 100, 'numExplorations', 100);
+        K_pot = gradDescent(statesM(i,:),'tolerance', .005, 'time', 15, ...
+            'maxIters', 100, 'numExplorations', 100, 'terms', 10);
         [T,X,drive,~,idx] = runOde(K_pot,statesM(i,:));
         Ks(i, :) = K_pot;
         Y = max(diff(drive)/(T(2)-T(1)));

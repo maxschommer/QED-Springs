@@ -1,7 +1,7 @@
  function springUI 
     width = 1;
-    height = 3;
-    stateInfo = load('StateInfo3M');
+    height = 5;
+    stateInfo = load('StateInfo5M');
     stateMatrix = -1*ones(height, width);
     KExec = zeros(width, size(stateInfo.Ks, 2));
     f = figure('Visible','off');
