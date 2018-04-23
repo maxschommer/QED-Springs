@@ -12,7 +12,7 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
     time = p.Results.time;
     init = p.Results.init;
 
-    n = 3.95; %measured natural frequency     
+    n = 4.1; %measured natural frequency     
     M = makeM(numMasses, n);
     
     tRange = linspace(0,time,500);
