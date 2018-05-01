@@ -50,6 +50,6 @@ for i in range(width):
 # bprev = Button(axprev, 'Previous')
 # bprev.on_clicked(callback.prev)
 
-mng = plt.get_current_fig_manager()
-mng.resize(*mng.window.maxsize())
+# mng = plt.get_current_fig_manager()
+# mng.resize(*mng.window.maxsize())
 plt.show()
