@@ -12,9 +12,8 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
     time = p.Results.time;
     init = p.Results.init;
 
-    n = 3.95; %measured natural frequency     
+    n = 4.1; %measured natural frequency     
     M = makeM(numMasses, n);
-    
     
     tRange = linspace(0,time,500);
     driving = makeDriving(K);
@@ -26,7 +25,7 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
     if exist('target') == 1
         Error = sum((X-target).^2,2) + 3*exp(-T);
         [cost,idx] = min(Error); 
-    else; cost = 0; 
+    else; cost = 0;   
     end
     
     for t = 1:length(tRange)
