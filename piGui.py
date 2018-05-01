@@ -1,9 +1,25 @@
 import numpy as np
+import matplotlib
+# matplotlib.use("qt4agg")
+# def patch_qt4agg():
+#     import matplotlib.backends.backend_qt4agg as backend
+#     code = """
+# def draw( self ):
+#     FigureCanvasAgg.draw(self)
+#     self.repaint()
+#     FigureCanvasQTAgg.draw = draw    
+# """
+#     exec(code, backend.__dict__)
+
+# patch_qt4agg()
+
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-import matplotlib
+# import matplotlib
 import pprint
 from screeninfo import get_monitors
+
+
 for m in get_monitors():
     print(str(m))
 
@@ -14,41 +30,34 @@ height = 5
 # w, h = matplotlib.figure.figaspect(3.)
 fig = plt.figure(figsize=(width,height))
 
-def buttonCallback(event):
-    print('you pressed', event.button, event.xdata, event.ydata)
-    button.color = 'Red'
+execMat = np.zeros((height, width))
+        
+class ButtonClickProcessor(object):
 
-class Index(object):
-    ind = 0
+    def __init__(self, axes, label, i, j):
+        self.button = Button(axes, label)
+        self.button.on_clicked(self.process)
+        self.button.color = 'Red'
+        self.button.hovercolor = self.button.color
+        self.colorMode = 0
+        self.colors = ['Red', 'Blue']
+        self.i = i
+        self.j = j
 
-    def next(self, event):
-        self.ind += 1
-        i = self.ind % len(freqs)
-        ydata = np.sin(2*np.pi*freqs[i]*t)
-        l.set_ydata(ydata)
-        plt.draw()
+    def process(self, event):
 
-    def prev(self, event):
-        self.ind -= 1
-        i = self.ind % len(freqs)
-        ydata = np.sin(2*np.pi*freqs[i]*t)
-        l.set_ydata(ydata)
-        plt.draw()
+        execMat[self.j][self.i] = not execMat[self.j][self.i]
+        print(execMat)
+        self.colorMode = not self.colorMode
+        self.button.color = self.colors[self.colorMode]
+        self.button.hovercolor = self.button.color
 
-callback = Index()
 buttons = []
 buttonAxes = []
 for i in range(width):
     for j in range(height):
         buttonAxes.append(plt.axes([i/float(width), j/float(height), 1/(float(width)), 1/float(height)]))
-        buttons.append(Button(buttonAxes[-1], ""))
-        buttons[-1].on_clicked(buttonCallback)
-# axprev = plt.axes([0.5, 0.05, 0.1, 0.075])
-# axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-# bnext = Button(axnext, 'Next')
-# bnext.on_clicked(callback.next)
-# bprev = Button(axprev, 'Previous')
-# bprev.on_clicked(callback.prev)
+        buttons.append(ButtonClickProcessor(buttonAxes[-1], "", i, height-1-j))
 
 # mng = plt.get_current_fig_manager()
 # mng.resize(*mng.window.maxsize())
