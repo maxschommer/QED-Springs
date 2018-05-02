@@ -2,6 +2,8 @@
     width = 1;
     height = 5;
     stateInfo = load('StateInfo5M');
+    csvwrite('KS', stateInfo.Ks);
+    csvwrite('StateInfo', stateInfo.States)
     stateMatrix = -1*ones(height, width);
     KExec = zeros(width, size(stateInfo.Ks, 2));
     f = figure('Visible','off');
