@@ -1,21 +1,8 @@
 import numpy as np
 import matplotlib
-# matplotlib.use("qt4agg")
-# def patch_qt4agg():
-#     import matplotlib.backends.backend_qt4agg as backend
-#     code = """
-# def draw( self ):
-#     FigureCanvasAgg.draw(self)
-#     self.repaint()
-#     FigureCanvasQTAgg.draw = draw    
-# """
-#     exec(code, backend.__dict__)
-
-# patch_qt4agg()
-
+import pyautogui
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
-# import matplotlib
 import pprint
 from screeninfo import get_monitors
 
@@ -23,7 +10,7 @@ from screeninfo import get_monitors
 for m in get_monitors():
     print(str(m))
 
-width = 10
+width = 5
 height = 5
 
 
@@ -35,6 +22,7 @@ execMat = np.zeros((height, width))
 class ButtonClickProcessor(object):
 
     def __init__(self, axes, label, i, j):
+        self.axes = axes
         self.button = Button(axes, label)
         self.button.on_clicked(self.process)
         self.button.color = 'Red'
@@ -47,10 +35,15 @@ class ButtonClickProcessor(object):
     def process(self, event):
 
         execMat[self.j][self.i] = not execMat[self.j][self.i]
-        print(execMat)
+        print(self.i)
+        print(self.j)
         self.colorMode = not self.colorMode
         self.button.color = self.colors[self.colorMode]
         self.button.hovercolor = self.button.color
+        pyautogui.moveRel(0, 1)
+        pyautogui.moveRel(0, -1)
+        fig.canvas.draw()
+
 
 buttons = []
 buttonAxes = []
