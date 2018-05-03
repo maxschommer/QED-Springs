@@ -1,7 +1,17 @@
  function springUI 
-    width = 1;
+    if (~exist('a'))
+        a = arduino;
+    end
+    
+    width = 5;
     height = 5;
-    stateInfo = load('StateInfo5M');
+    
+    for i = 1:width
+        str_Serv = sprintf('D%d',i+1);
+        Servos(i) = servo(a, str_Serv);
+    end
+    
+    stateInfo = load('StateInfo5M_2');
     stateMatrix = -1*ones(height, width);
     KExec = zeros(width, size(stateInfo.Ks, 2));
     f = figure('Visible','off');
@@ -27,10 +37,14 @@
          for k = 1:width
              S = stateInfo.States(:, height+1:end);
              V = stateMatrix(: , k)';
-             index = find(ismember(S,V,'rows'), 1, 'first'); 
+             index = find(ismember(S,V,'rows'), 1, 'first');
              KExec(k, :) = stateInfo.Ks(index, :);
+             [T,X,drive,cost,idx] = runOde(KExec(k,:),stateInfo.States(index, :),'time', 25 );
+             T(idx)
+             cost
+             Times(k) = T(idx);
          end
-         moveOneServo(KExec(1, :))
+         moveServos(KExec, Servos, Times)
     end
     function togglebutton_Callback(hObject, eventdata, ~)
         uVal = eventdata.Source.UserData;

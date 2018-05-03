@@ -32,10 +32,3 @@ end
 Ks = cat(1, Ks, flipud(-1*Ks));
 States = cat(1, statesM, flipud(-1*statesM));
 save('StateInfo5M_2','Ks', 'States')
-
-% clf(figure(1))
-% hold on
-% for i = 1:size(statesM)
-%     [T,X,drive,~,idx] = runOde(Ks(i,:),statesM(i,:));
-%     plot(T-T(idx),X(:,4:6)) 
-% end
