@@ -1,13 +1,13 @@
 clear all
-numMasses = 5;
+load('StateInfo5MSing.mat')
 terms = 10;
-K = rand(1,terms/2);
-F = (1:length(K))/(1.6);
+K = Ks(5,:);
 
-clf(figure(1))
-hold on
+a = arduino;
+s1 = servo(a,'D2');
+s2 = servo(a,'D3');
+s3 = servo(a,'D4');
+s4 = servo(a,'D5');
+s5 = servo(a,'D6');
 
-for t = linspace(0,15,500)
-   plot(t,dot(sin(t*F),K),'.') 
-   drawnow
-end
+moveFiveServos(K,s1,s2,s3,s4,s5)

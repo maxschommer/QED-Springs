@@ -43,9 +43,8 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
     end
     
     function driving = makeDriving(K)
-%         A = K(1:length(K)/2);
-%         F = K(length(K)/2+1:end);
-        F = (1:length(K))/(1.6);
+        A = K(1:length(K)/2);
+        F = K(length(K)/2+1:end);
         driveMatrix = zeros(numMasses*2,1);
         driveMatrix(end,1) = 1;
         driving = @(t) dot(sin(t*F),A) * driveMatrix;

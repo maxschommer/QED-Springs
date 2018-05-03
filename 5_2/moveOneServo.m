@@ -12,7 +12,7 @@ function moveOneServo(K,s)
     t0 = clock;
     t = 0;
 
-    while t < 25
+    while t < 15
        t = etime(clock , t0);
        writePosition(s,driving(t))
     end
