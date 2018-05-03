@@ -1,13 +1,12 @@
 function K = gradDescent(target,varargin)
     p = inputParser;
     addRequired(p,'target');
-    addParameter(p, 'tolerance', .05);
-    addParameter(p, 'time', 15);
-    addParameter(p, 'maxIters', 400);
+    addParameter(p, 'tolerance', .005);
+    addParameter(p, 'time', 25);
+    addParameter(p, 'maxIters', 600);
     addParameter(p, 'terms', 20);
-    addParameter(p, 'numExplorations', 100);
+    addParameter(p, 'numExplorations', 1000);
     parse(p, target, varargin{:});
-    
     maxIters = p.Results.maxIters;
     time = p.Results.time;
     tolerance = p.Results.tolerance;
@@ -18,7 +17,8 @@ function K = gradDescent(target,varargin)
     
     exitflag = 0;
     k = 1;
-    kLim = 5;
+    kLim = 10;
+    
     while exitflag == 0
         if k > kLim
             maxIters = maxIters + 500;
@@ -29,7 +29,7 @@ function K = gradDescent(target,varargin)
         end
         options = optimset('PlotFcns',@optimplotfval, 'OutputFcn', @outfun, 'MaxIter', maxIters);
         K = kCostMat(k, 2:end);
-        k = k+1
+        k = k+1;
         [K,~,exitflag] = fminsearch(@objFun,K,options);
     end
     
@@ -38,9 +38,7 @@ function K = gradDescent(target,varargin)
                 ['Exploring Random Solutions: ' int2str(0)]);
         kCostMat = zeros(numExplorations, 1+terms);
         for j =1:numExplorations
-            
             waitbar(j/numExplorations, w, ['Exploring Random Solutions: ' int2str(j)]);
-            
             [newK, cost] = makeNewK(terms);        
             kCostMat(j, :) = [cost, newK];
         end
@@ -62,6 +60,6 @@ function K = gradDescent(target,varargin)
 
     function [K, cost] = makeNewK(terms)
         K = [rand(1,terms/2),rand(1,terms/2)*5];
-        cost = objFun(K); 
+        cost = objFun(K);
     end
 end

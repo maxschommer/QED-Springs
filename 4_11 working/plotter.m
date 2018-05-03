@@ -13,5 +13,3 @@ for mass = 1:5
     plot(data(:,1),data(:,mass+1),'k')
     plot(T+4.6,X(:,mass+5)*60,'r')
 end
-
-

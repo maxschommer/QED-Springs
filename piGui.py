@@ -9,7 +9,10 @@ import pprint
 from screeninfo import get_monitors
 import time
 import Adafruit_PCA9685
+<<<<<<< HEAD
 import copy
+=======
+>>>>>>> 46380eb0cf3eef052b7a794a2bbd29561b42a3fa
 
 KS = genfromtxt('./4_11 working/KS.csv', delimiter=',')
 StateInfo = genfromtxt('./4_11 working/StateInfo.csv', delimiter=',')
@@ -89,8 +92,6 @@ class ExecuteButtonProcessor(object):
         	moveServos(KsRes, [], Servos)
         	execMat[execMat == -1] = 0
 		# print(KsRes)
-
-#       for column in 
     
 class ButtonClickProcessor(object):
 
@@ -128,8 +129,8 @@ for i in range(width):
 execButtonAxes = plt.axes([1-1/(width+1), 0, 1/(float(width+1)), height])
 execButton = ExecuteButtonProcessor(execButtonAxes, "Execute")
 
+execButtonAxes = plt.axes([1-1/(width+1), 0, 1/(float(width+1)), height])
+execButton = ExecuteButtonProcessor(execButtonAxes, "Execute")
 
-# mng = plt.get_current_fig_manager()
-# mng.resize(*mng.window.maxsize())
 plt.show()
 
