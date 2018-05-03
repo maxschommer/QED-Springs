@@ -1,3 +1,10 @@
+stateInfo = load('StateInfo5MScaled');
+Ks = stateInfo.Ks;
+States = stateInfo.States;
+Ks(:, length(Ks(1, :))/2+1:end) = Ks(:, length(Ks(1, :))/2+1:end)*2.82142857143;
+save('StateInfo5MScaled','Ks', 'States')
+
+
 clear all
 numMasses = 5;
 terms = 10;

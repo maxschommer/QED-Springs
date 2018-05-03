@@ -51,4 +51,5 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
         driveMatrix(end,1) = 1;
         driving = @(t) dot(sin(t*F),A) * driveMatrix;
     end
+
 end
