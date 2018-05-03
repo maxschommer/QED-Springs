@@ -1,6 +1,5 @@
 function moveOneServo(K, States)
 
-    
     if exist('a') ~= 1
         a = arduino;
         s = servo(a,'D4');
@@ -9,8 +8,8 @@ function moveOneServo(K, States)
 
     if exist('K') ~= 1 
         K = gradDescent([0,0,0,1,0,0],'tolerance', .005);
-
     end
+
     A = K(1:length(K)/2);
     F = K(length(K)/2+1:end);
     
