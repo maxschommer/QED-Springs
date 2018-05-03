@@ -59,7 +59,7 @@ function K = gradDescent(target,varargin)
     end
 
     function [K, cost] = makeNewK(terms)
-        K = [rand(1,terms/2)*5-2.5,rand(1,terms/2)*20];
-        cost = objFun(K); 
+        K = [rand(1,terms/2),rand(1,terms/2)*5];
+        cost = objFun(K);
     end
 end

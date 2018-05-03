@@ -2,12 +2,12 @@ function moveOneServo(K,s)
 
 %     a = arduino;
 %     s = servo(a,'D4');
-%     writePosition(s,.5)
+    writePosition(s,.5)
     
     A = K(1:length(K)/2);
     F = K(length(K)/2+1:end);
     driving = @(t) dot(sin(t*F),A)/10 +.5;
-
+    
     pause(1)
     t0 = clock;
     t = 0;
