@@ -1,5 +1,5 @@
 clear all
-numMasses = 3;
+numMasses = 5;
 numSolutions = 1; % For each state, the number of solutions to explore for 
                   % minimizing the derivative of the solution.
 
