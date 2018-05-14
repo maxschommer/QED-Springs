@@ -10,6 +10,8 @@ for targetNum = 0:1:(2^(numMasses-1)-1)
 end
 statesM(1,:)
 size(statesM)
+States = cat(1, statesM, flipud(-1*statesM))
+pause(90)
 % f = waitbar( 0, ['Loading ' int2str(0) ' ...']);
 
 parfor i = 1:2^(numMasses-1)
@@ -17,7 +19,7 @@ parfor i = 1:2^(numMasses-1)
     
     for j = 1:numSolutions
 %         waitbar( j/(2*numSolutions), f, ['Loading ' int2str(i) ' ...'])
-        K_pot = gradDescent(statesM(i,:),'tolerance', .005, 'time', 25, ...
+        K_pot = gradDescent(statesM(i,:),'tolerance', 5, 'time', 25, ...
             'maxIters', 100, 'numExplorations', 100, 'terms', 24);
         [T,X,drive,~,idx] = runOde(K_pot,statesM(i,:));
         Ks(i, :) = K_pot;
@@ -31,4 +33,4 @@ end
 
 Ks = cat(1, Ks, flipud(-1*Ks));
 States = cat(1, statesM, flipud(-1*statesM));
-save('StateInfo5M_2','Ks', 'States')
+% save('StateInfo5M_2','Ks', 'States')

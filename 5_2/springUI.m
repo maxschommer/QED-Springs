@@ -11,7 +11,7 @@
         Servos(i) = servo(a, str_Serv);
     end
     
-    stateInfo = load('StateInfo5M_2');
+    stateInfo = load('StateInfo5M_3');
     stateMatrix = -1*ones(height, width);
     KExec = zeros(width, size(stateInfo.Ks, 2));
     f = figure('Visible','off');
@@ -34,23 +34,27 @@
     f.Visible = 'on';
     
     function execButton_Callback(~, ~, ~)
+%         clf(figure(2))
          for k = 1:width
              S = stateInfo.States(:, height+1:end);
              V = stateMatrix(: , k)';
              index = find(ismember(S,V,'rows'), 1, 'first');
              KExec(k, :) = stateInfo.Ks(index, :);
              [T,X,drive,cost,idx] = runOde(KExec(k,:),stateInfo.States(index, :),'time', 25 );
-             T(idx)
-             cost
              Times(k) = T(idx);
+             
+%              subplot(5,1,k)
+%              plot(T-T(idx),X)
+              
          end
-         moveServos(KExec, Servos, Times)
+         moveServos(KExec, Servos, Times, 10)
     end
+
     function togglebutton_Callback(hObject, eventdata, ~)
         uVal = eventdata.Source.UserData;
         if hObject.Value == 1
             stateMatrix(uVal(1), uVal(2)) = 1; 
-            set(gcbo,'Backgroundcolor','g');
+            set(gcbo,'Backgroundcolor','b');
         else
             stateMatrix(uVal(1), uVal(2)) = -1;
             set(gcbo, 'Backgroundcolor','r');
