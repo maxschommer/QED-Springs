@@ -1,7 +1,10 @@
 function moveOneServo(K, States)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 =======
+=======
+>>>>>>> Stashed changes
     numMasses = 5;
     for targetNum = 0:1:(2^(numMasses-1)-1)     
         biV = de2bi(targetNum, numMasses);
