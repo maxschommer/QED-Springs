@@ -1,4 +1,5 @@
-function moveServos(Ks, Servos, Times, scaling)
+function moveServos(Ks, Servos, Times, scaling, dispOnly)
+   
    maxT = max(Times);
    for j = 1:length(Times)
         startTimes(j) = maxT-Times(j);
@@ -31,17 +32,25 @@ function moveServos(Ks, Servos, Times, scaling)
    while t < maxT
       t = etime(clock , t0);
       for i = 1:length(Servos)
-           writePosition(Servos(i), driving{i}(t, startTimes(i), i));
-%            subplot(5,1,i)
-%            hold on
-%            plot(t,driving{i}(t,startTimes(i),i),'.')
+
+          if Servos(i) == i-1
+              subplot(5,1,i)
+               hold on
+               plot(t,driving{i}(t,startTimes(i),i),'.')
+          else
+               writePosition(Servos(i), driving{i}(t, startTimes(i), i));
+          end
+          
+           
       end
       
    end
-   pause(3)
-  
-   for i =  1:length(Servos)
-       writePosition(Servos(i),.5)
+   if ~dispOnly
+       pause(3)
+
+       for i =  1:length(Servos)
+           writePosition(Servos(i),.5)
+       end
    end
 
 end

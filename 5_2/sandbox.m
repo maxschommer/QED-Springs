@@ -6,7 +6,7 @@ for n = 1:32
 
     target = States(n,:)
     [T,X,~,cost,idxs(n)] =  runOde(-Ks(n,:),target,'time',25);
-
+    times(n) = T(idxs(n))
 end
 
 clf(figure(1))

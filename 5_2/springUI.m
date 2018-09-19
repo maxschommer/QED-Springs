@@ -1,14 +1,20 @@
  function springUI 
-    if (~exist('a'))
-        a = arduino;
+    dispOnly = true;
+    if (~dispOnly)
+        if (~exist('a'))
+            a = arduino;
+        end
     end
+
     
-    width = 5;
+    width = 1;
     height = 5;
     
-    for i = 1:width
-        str_Serv = sprintf('D%d',i+1);
-        Servos(i) = servo(a, str_Serv);
+    if ~dispOnly
+        for i = 1:width
+            str_Serv = sprintf('D%d',i+1);
+            Servos(i) = servo(a, str_Serv);
+        end
     end
     
     stateInfo = load('StateInfo5M_3');
@@ -47,7 +53,11 @@
 %              plot(T-T(idx),X)
               
          end
-         moveServos(KExec, Servos, Times, 10)
+         if ~dispOnly
+            moveServos(KExec, Servos, Times, 10, dispOnly)
+         else
+            moveServos(KExec, range(width), Times, 10, dispOnly)
+         end
     end
 
     function togglebutton_Callback(hObject, eventdata, ~)
