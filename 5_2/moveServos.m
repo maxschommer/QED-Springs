@@ -35,7 +35,6 @@ function moveServos(Ks, Servos, Times, scaling)
 %            subplot(5,1,i)
 %            hold on
 %            plot(t,driving{i}(t,startTimes(i),i),'.')
-            
       end
       
    end
