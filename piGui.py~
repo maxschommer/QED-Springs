@@ -12,80 +12,105 @@ import Adafruit_PCA9685
 #import copy
 
 
-KS = genfromtxt('./4_11 working/KS.csv', delimiter=',')
-StateInfo = genfromtxt('./4_11 working/StateInfo.csv', delimiter=',')
+KS = genfromtxt('./5_2/CSV_StateInfo/Ks.csv', delimiter=',')
+States = genfromtxt('./5_2/CSV_StateInfo/States.csv', delimiter=',')
 
-width = 3
+width = 1
 height = 5
 
+# Initialise the PCA9685 using the default address (0x40).
+pwm = Adafruit_PCA9685.PCA9685()
 
-# w, h = matplotlib.figure.figaspect(3.)
+# Alternatively specify a different address and/or bus:
+#pwm = Adafruit_PCA9685.PCA9685(address=0x41, busnum=2)
+
+# Configure min and max servo pulse lengths
+servo_min = 150  # Min pulse length out of 4096
+servo_max = 600  # Max pulse length out of 4096
+
+
+
+# Set frequency to 60hz, good for servos.
+pwm.set_pwm_freq(60)
+
+w, h = matplotlib.figure.figaspect(3.)
 fig = plt.figure(figsize=(width,height))
 
 execMat = np.zeros((height, width))
 
 class Servo(object):
 	"""A class for a single servo with functions to move it"""
-	def __init__(self, pwm, PinNum, servo_min=150, servo_max=600):
+	def __init__(self, PinNum):
 		super(Servo, self).__init__()
 		self.PinNum = PinNum
-		self.servo_min = servo_min  # Min pulse length out of 4096
-		self.servo_max = servo_max  # Max pulse length out of 4096
-		self.pwm = pwm
 
 	def set_servo_angle(self, angle):
-		pulse = int((angle)*(self.servo_max - self.servo_min) + self.servo_min)
-#		pulse_length = 1000000    # 1,000,000 us per second
-#		pulse_length //= 60       # 60 Hz
-#		pulse_length //= 4096     # 12 bits of resolution
-#		pulse *= 1000
-#		pulse //= pulse_length
+		pulse = int(angle*(servo_max-servo_min)+servo_min)
 		print(pulse)
-		self.pwm.set_pwm(self.PinNum, 0, pulse)
+		pwm.set_pwm(self.PinNum, 0, pulse)
+
+    	
 
 
-def moveServos(KSIn, IDXs, Servos, timeEnd=10, res=500, scaling=.01):
+def moveServos(KSIn, IDXs, Servos, timeEnd=25, res=500, scaling=10):
 	As = []
 	Fs = []
 	DriveFuncs = []
-	print(KSIn)
+	#print(KSIn)
 	for i, K in enumerate(KSIn, 0):
 		Fs.append(K[0:int(len(K)/2)])
-		As.append(K[int(len(K)/2-1):-1])
-	print(Fs[0])
-	print(As[0])
+		As.append(K[int(len(K)/2):])
+	print("Fs: ", Fs[0])
+	print("As: ", As[0])
+	startTime = 0
 	for i in range(width):
-		drive = lambda t, i=i: np.dot(np.sin(t*Fs[i]),As[i])*scaling +.5 # Have to set i as the default argument so lambda function isn't overwritten.
+		drive = lambda t, i=i: np.dot(np.sin((t-startTime)*Fs[i] * 2* np.pi), As[i]/scaling + .5)  # Have to set i as the default argument so lambda function isn't overwritten.
 		DriveFuncs.append(drive);
 	
+	pltfig = plt.figure()
 	t0 = time.time();
 	t = 0;
+	y = []
+	ts = []
 	while t < timeEnd:
-		t = time.time()-t0;
+		#t = time.time()-t0;
+		t = t + .05
+		#print("t: ", t)
 		for i, Servo in enumerate(Servos, 0):
-			print(DriveFuncs[i](t))
-			Servo.set_servo_angle(DriveFuncs[i](t))
+			#print(180*DriveFuncs[i](t))
+			
+			y.append(DriveFuncs[i](t))
+			ts.append(t)
+	
+			#Servo.set_servo_angle(DriveFuncs[i](t))
+	plt.plot(ts, y)
+	plt.show()
 
 class ExecuteButtonProcessor(object):
 	def __init__(self, axes, label):
 		self.axes = axes
 		self.button = Button(axes, "Execute")
 		self.button.on_clicked(self.process)
-
+		self.intializeServos()
+		
+	def intializeServos(self):
+		for i in range(width):
+			servo = Servo(i)
+			servo.set_servo_angle(90)
+			
+			print("Setting Angle")
+			
 	def process(self, event):
-		pwm = Adafruit_PCA9685.PCA9685()
+		
 		execMat[execMat == 0] = -1
-		# print(StateInfo[:, width:2*width])
+		# print(States[:, width:2*width])
 		KsRes = []
 		Servos = []
 		for i in range(width):
-			e = StateInfo[:, 5:10] # The width of the array for StateInfo
+			e = States[:, 5:10] # The width of the array for States
 			loc = np.where(np.all((e-execMat[:,i])==0, axis=1))[0][0]
-			print("Loc" , loc)
-			print("New Indexed", KS[:, loc])
-			print("KS Indexed", KS[loc, :])
 			KsRes.append(KS[loc, :])
-			Servos.append(Servo(pwm, i))
+			Servos.append(Servo(i))
 		
 		for res in KsRes:
 			# pass
@@ -130,9 +155,5 @@ for i in range(width):
 
 execButtonAxes = plt.axes([1-1/(width+1), 0, 1/(float(width+1)), height])
 execButton = ExecuteButtonProcessor(execButtonAxes, "Execute")
-
-execButtonAxes = plt.axes([1-1/(width+1), 0, 1/(float(width+1)), height])
-execButton = ExecuteButtonProcessor(execButtonAxes, "Execute")
-
 plt.show()
 

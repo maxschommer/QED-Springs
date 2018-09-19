@@ -34,12 +34,14 @@ function moveServos(Ks, Servos, Times, scaling, dispOnly)
       for i = 1:length(Servos)
 
           if Servos(i) == i-1
-               subplot(5,1,i)
+              subplot(5,1,i)
                hold on
                plot(t,driving{i}(t,startTimes(i),i),'.')
           else
                writePosition(Servos(i), driving{i}(t, startTimes(i), i));
-          end           
+          end
+          
+           
       end
       
    end
