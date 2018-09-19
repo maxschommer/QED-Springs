@@ -42,10 +42,10 @@
              KExec(k, :) = stateInfo.Ks(index, :);
              [T,X,drive,cost,idx] = runOde(KExec(k,:),stateInfo.States(index, :),'time', 25 );
              Times(k) = T(idx);
-             
+
 %              subplot(5,1,k)
 %              plot(T-T(idx),X)
-              
+
          end
          moveServos(KExec, Servos, Times, 10)
     end
