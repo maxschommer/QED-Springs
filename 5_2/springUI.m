@@ -1,3 +1,4 @@
+
  function springUI 
     dispOnly = true;
     if (~dispOnly)
@@ -48,10 +49,8 @@
              KExec(k, :) = stateInfo.Ks(index, :);
              [T,X,drive,cost,idx] = runOde(KExec(k,:),stateInfo.States(index, :),'time', 25 );
              Times(k) = T(idx);
-             
 %              subplot(5,1,k)
 %              plot(T-T(idx),X)
-              
          end
          if ~dispOnly
             moveServos(KExec, Servos, Times, 10, dispOnly)
