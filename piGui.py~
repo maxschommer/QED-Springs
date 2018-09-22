@@ -14,6 +14,7 @@ import Adafruit_PCA9685
 
 KS = genfromtxt('./5_2/CSV_StateInfo/Ks.csv', delimiter=',')
 States = genfromtxt('./5_2/CSV_StateInfo/States.csv', delimiter=',')
+Times = genfromtxt('./5_2/CSV_StateInfo/times.csv', delimiter=',')
 
 width = 1
 height = 5
@@ -52,7 +53,7 @@ class Servo(object):
     	
 
 
-def moveServos(KSIn, IDXs, Servos, timeEnd=25, res=500, scaling=10):
+def moveServos(KSIn, theseTimes, Servos, timeEnd=25, res=500, scaling=10):
 	As = []
 	Fs = []
 	DriveFuncs = []
@@ -64,10 +65,9 @@ def moveServos(KSIn, IDXs, Servos, timeEnd=25, res=500, scaling=10):
 	print("As: ", As[0])
 	startTime = 0
 	for i in range(width):
-		drive = lambda t, i=i: np.dot(np.sin((t-startTime)*Fs[i] * 2* np.pi), As[i]/scaling + .5)  # Have to set i as the default argument so lambda function isn't overwritten.
-		DriveFuncs.append(drive);
-	
-	pltfig = plt.figure()
+		drive = lambda t, i=i: np.dot(np.sin((t-theseTimes[i])*As[i]), Fs[i]/scaling + .5)  # Have to set i as the default argument so lambda function isn't overwritten.
+		DriveFuncs.append(drive)
+
 	t0 = time.time();
 	t = 0;
 	y = []
@@ -77,12 +77,15 @@ def moveServos(KSIn, IDXs, Servos, timeEnd=25, res=500, scaling=10):
 		t = t + .05
 		#print("t: ", t)
 		for i, Servo in enumerate(Servos, 0):
+			thisFunc = DriveFuncs[i]
 			#print(180*DriveFuncs[i](t))
 			
-			y.append(DriveFuncs[i](t))
+			y.append(thisFunc(t))
 			ts.append(t)
 	
 			#Servo.set_servo_angle(DriveFuncs[i](t))
+	
+	fitplt = plt.figure()
 	plt.plot(ts, y)
 	plt.show()
 
@@ -106,16 +109,18 @@ class ExecuteButtonProcessor(object):
 		# print(States[:, width:2*width])
 		KsRes = []
 		Servos = []
+		theseTimes = []
 		for i in range(width):
 			e = States[:, 5:10] # The width of the array for States
 			loc = np.where(np.all((e-execMat[:,i])==0, axis=1))[0][0]
 			KsRes.append(KS[loc, :])
 			Servos.append(Servo(i))
+			theseTimes.append(Times[loc])
 		
 		for res in KsRes:
 			# pass
 			print(res)
-        	moveServos(KsRes, [], Servos)
+        	moveServos(KsRes, theseTimes, Servos)
         	execMat[execMat == -1] = 0
 		# print(KsRes)
     
