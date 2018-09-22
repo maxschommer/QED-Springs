@@ -1,22 +1,26 @@
+#!/bin/bash
+
 from __future__ import division
 import numpy as np
 from numpy import genfromtxt
 import matplotlib
-import pyautogui
+#import pyautogui
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 import pprint
 from screeninfo import get_monitors
 import time
 import Adafruit_PCA9685
-#import copy
 
 
-KS = genfromtxt('./5_2/CSV_StateInfo/Ks.csv', delimiter=',')
-States = genfromtxt('./5_2/CSV_StateInfo/States.csv', delimiter=',')
-Times = genfromtxt('./5_2/CSV_StateInfo/times.csv', delimiter=',')
 
-width = 1
+KS = genfromtxt('/home/pi/Documents/Github/QED-Springs/5_2/CSV_StateInfo/Ks.csv', delimiter=',')
+States = genfromtxt('/home/pi/Documents/Github/QED-Springs/5_2/CSV_StateInfo/States.csv', delimiter=',')
+Durations = genfromtxt('/home/pi/Documents/Github/QED-Springs/5_2/CSV_StateInfo/times.csv', delimiter=',')
+Poses = genfromtxt('/home/pi/Documents/Github/QED-Springs/5_2/CSV_StateInfo/Poss.csv', delimiter=',')
+PosTims = genfromtxt('/home/pi/Documents/Github/QED-Springs/5_2/CSV_StateInfo/Tims.csv', delimiter=',')
+
+width = 5
 height = 5
 
 # Initialise the PCA9685 using the default address (0x40).
@@ -50,44 +54,31 @@ class Servo(object):
 		print(pulse)
 		pwm.set_pwm(self.PinNum, 0, pulse)
 
-    	
 
-
-def moveServos(KSIn, theseTimes, Servos, timeEnd=25, res=500, scaling=10):
-	As = []
-	Fs = []
-	DriveFuncs = []
-	#print(KSIn)
-	for i, K in enumerate(KSIn, 0):
-		Fs.append(K[0:int(len(K)/2)])
-		As.append(K[int(len(K)/2):])
-	print("Fs: ", Fs[0])
-	print("As: ", As[0])
-	startTime = 0
-	for i in range(width):
-		drive = lambda t, i=i: np.dot(np.sin((t-theseTimes[i])*Fs[i]), As[i]/scaling + .5)  # Have to set i as the default argument so lambda function isn't overwritten.
-		DriveFuncs.append(drive)
-
-	t0 = time.time();
+def moveServos(Poses, Times, Durations, Servos):
+	
 	t = 0;
 	y = []
 	ts = []
-	while t < timeEnd:
-		#t = time.time()-t0;
-		t = t + .05
-		#print("t: ", t)
-		for i, Servo in enumerate(Servos, 0):
-			thisFunc = DriveFuncs[i]
-			#print(180*DriveFuncs[i](t))
+
+	maxTime = 25 - max(Durations)
+	t0 = time.time() - maxTime;
+	maxIndex = next(i for i,v in enumerate(Times) if v > maxTime)
+	i = maxIndex
+	print(Times[i])
+	while t < Times[-1]:
+		t = time.time()-t0;
+		if t > Times[i]:
+			for j, Servo in enumerate(Servos, 0):
+				Servo.set_servo_angle(Poses[j][i])
+			i = i + 1
 			
-			y.append(thisFunc(t))
-			ts.append(t)
-	
-			#Servo.set_servo_angle(DriveFuncs[i](t))
-	
-	fitplt = plt.figure()
-	plt.plot(ts, y)
-	plt.show()
+	time.sleep(3)
+	for Servo in Servos:
+		Servo.set_servo_angle(.5)
+
+
+
 
 class ExecuteButtonProcessor(object):
 	def __init__(self, axes, label):
@@ -99,28 +90,32 @@ class ExecuteButtonProcessor(object):
 	def intializeServos(self):
 		for i in range(width):
 			servo = Servo(i)
-			servo.set_servo_angle(90)
+			servo.set_servo_angle(.5)
 			
 			print("Setting Angle")
-			
+				
 	def process(self, event):
-		
+
 		execMat[execMat == 0] = -1
 		# print(States[:, width:2*width])
-		KsRes = []
+		#KsRes = []
+		PosRes = []
+		DurRes = []
 		Servos = []
-		theseTimes = []
+		#theseTimes = []
 		for i in range(width):
 			e = States[:, 5:10] # The width of the array for States
 			loc = np.where(np.all((e-execMat[:,i])==0, axis=1))[0][0]
-			KsRes.append(KS[loc, :])
+			#KsRes.append(KS[loc, :])
+			PosRes.append(Poses[loc, :])
+			DurRes.append(Durations[loc])
 			Servos.append(Servo(i))
-			theseTimes.append(Times[loc])
-		
-		for res in KsRes:
+			#theseTimes.append(Times[loc])
+
+		#for res in KsRes:
 			# pass
-			print(res)
-        	moveServos(KsRes, theseTimes, Servos)
+		#	print(res)
+        	moveServos(PosRes, PosTims, DurRes, Servos)
         	execMat[execMat == -1] = 0
 		# print(KsRes)
     
@@ -160,5 +155,9 @@ for i in range(width):
 
 execButtonAxes = plt.axes([1-1/(width+1), 0, 1/(float(width+1)), height])
 execButton = ExecuteButtonProcessor(execButtonAxes, "Execute")
+
+mng = plt.get_current_fig_manager()
+mng.full_screen_toggle()
+
 plt.show()
 
