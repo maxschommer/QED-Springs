@@ -11,12 +11,7 @@ function res = moveServos(Ks, Servos, Times, scaling, dispOnly)
        Fs(i, :) = K(length(Ks)/2+1:end)
        driving{i} = @(t, startTime, i) ...
            ifelse( t<startTime, .5, ...
-<<<<<<< HEAD
-           dot(sin((t-startTime) * Fs(i, :)), As(i, :))/scaling +.5);
-%             ifelse(t<maxT,dot(sin((t-startTime)*Fs(i, :)),As(i, :))/scaling +.5, .5));
-=======
            dot(sin((t-startTime) * Fs(i, :)),As(i, :))/scaling +.5);
->>>>>>> 26ae09f212d1d0d9c324af0a12caddbdd0b2a975
            
    end
     
@@ -39,19 +34,13 @@ function res = moveServos(Ks, Servos, Times, scaling, dispOnly)
       t = etime(clock , t0);
       for i = 1:length(Servos)
 
-<<<<<<< HEAD
-          if Servos(i) == i-1
-               subplot(5,1,i)
-               hold on
-               plot(t,driving{i}(t,startTimes(i),i),'.')
-=======
+
           if dispOnly
               subplot(length(Servos),1,i)
               hold on
               y(tIdx) = driving{i}(t,startTimes(i),i);
               ts(tIdx) = t;
               
->>>>>>> 26ae09f212d1d0d9c324af0a12caddbdd0b2a975
           else
                writePosition(Servos(i), driving{i}(t, startTimes(i), i));
           end           
