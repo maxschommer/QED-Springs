@@ -31,14 +31,15 @@ function res = moveServos(Ks, Servos, Times, scaling, dispOnly)
    clf(figure(2))
    while t < maxT
       tIdx = tIdx + 1;
-      t = etime(clock , t0);
+%       t = etime(clock , t0);
+      t = t + .05;
       for i = 1:length(Servos)
 
 
           if dispOnly
               subplot(length(Servos),1,i)
               hold on
-              y(tIdx) = driving{i}(t,startTimes(i),i);
+              ys(tIdx) = driving{i}(t,startTimes(i),i);
               ts(tIdx) = t;
               
           else
@@ -48,8 +49,8 @@ function res = moveServos(Ks, Servos, Times, scaling, dispOnly)
       
    end
    
-   plot(ts,y)
-   
+   plot(ts,ys)
+   res = [ts; ys];
    if ~dispOnly
        pause(3)
 

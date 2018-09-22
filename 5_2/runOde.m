@@ -33,7 +33,7 @@ function [T,X,drive,cost,idx] = runOde(K,target, varargin)
     
     for t = 1:length(tRange)
         d = driving(tRange(t));
-        drive(t) = d(end,1); 
+        drive(t) = d(end,1);
     end
     
     function M = makeM(numMasses, naturalFrequency)

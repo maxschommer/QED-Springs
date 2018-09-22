@@ -8,7 +8,7 @@
     end
 
     
-    width = 1;
+    width = 2;
     height = 5;
     
     if ~dispOnly
